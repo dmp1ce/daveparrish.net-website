@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Dave Parrish - How to Create a PKGBUILD for a AppImage binary</title>
+
+        <!-- Stylesheets. -->
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+
+        <!-- Metadata. -->
+        <meta name="keywords" content="daveparrish,drupal,haskell,liberty,bitcoin,linux,blog,hakyll" />
+        <meta name="description" content="Dave Parrish - Hakyll blog" />
+    </head>
+    <body>
+        <div id="main">
+            <div id="header">
+                <a href="../">
+                    <img src="../images/lambda.png" alt="lambda" />
+                    Dave Parrish's Blog
+                </a>
+            </div>
+            <!-- Sidebar. -->
+            <div id="sidebar">
+                <a href="../index.html">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../projects.html">Projects</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+
+            </div>
+
+            <div id="content">
+		<h1>How to Create a PKGBUILD for a AppImage binary</h1>
+                <div class="info">Posted on November  7, 2019</div>
+
+<hr />
+<p>On Arch Linux PKGBUILD scripts can be used to help manage installing and updating AppImage software releases.</p>
+<h2 id="appimage-pkgbuild-template">AppImage PKGBUILD Template</h2>
+<p>Using the following template it should be easy to create your own PKGBUILD script from an AppImage posted on public site like Github.</p>
+<p>To use the PKGBUILD run <code>makepkg</code> to build a <code>my-project-appimage-0.0.1-1-x86_64.pkg.tar.xz</code>. Then the package can be installed with <code>pacman -U my-project-appimage-0.0.1-1-x86_64.pkg.tar.xz</code>. The AppImage can then be started by running <code>my-project-appimage</code> on the command line to start the appimage.</p>
+<p>When there is a new release for the AppImage, the version, AppImage source location and sha256 hash can be updated, rebuilt and reinstalled.</p>
+<hr />
+<p><strong>NOTE:</strong> See <a href="../posts/2019-11-16-Better-AppImage-PKGBUILD-template.html">new post</a> on improving upon this template for better GUI integration.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># Maintainer: My Name &lt;myemail@domain.me&gt;</span></a>
+<a class="sourceLine" id="cb1-2" title="2"></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="va">pkgname=</span>my-project-appimage</a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="va">pkgver=</span>0.0.1</a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="va">pkgrel=</span>1</a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="va">pkgdesc=</span><span class="st">&quot;Description of my project&quot;</span></a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="va">arch=(</span><span class="st">'x86_64'</span><span class="va">)</span></a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="va">url=</span><span class="st">&quot;https://github.com/user/repo/&quot;</span></a>
+<a class="sourceLine" id="cb1-9" title="9"><span class="va">license=(</span><span class="st">'custom:Unlicense'</span><span class="va">)</span></a>
+<a class="sourceLine" id="cb1-10" title="10"><span class="va">depends=(</span><span class="st">'zlib'</span><span class="va">)</span></a>
+<a class="sourceLine" id="cb1-11" title="11"><span class="va">options=(</span>!strip<span class="va">)</span></a>
+<a class="sourceLine" id="cb1-12" title="12"><span class="va">source_x86_64=(</span><span class="st">&quot;</span><span class="va">${pkgname}</span><span class="st">-</span><span class="va">${pkgver}</span><span class="st">.AppImage::https://github.com/MyGithubUSERNAME/MyProjectRepo/releases/download/</span><span class="va">${pkgver}</span><span class="st">/myproject.AppImage&quot;</span></a>
+<a class="sourceLine" id="cb1-13" title="13">               <span class="st">&quot;https://raw.githubusercontent.com/MyGithubUSERNAME/MyProjectRepo/</span><span class="va">${pkgver}</span><span class="st">/LICENSE&quot;</span></a>
+<a class="sourceLine" id="cb1-14" title="14">              )</a>
+<a class="sourceLine" id="cb1-15" title="15"><span class="va">noextract=(</span><span class="st">&quot;</span><span class="va">${pkgname}</span><span class="st">-</span><span class="va">${pkgver}</span><span class="st">.AppImage&quot;</span><span class="va">)</span></a>
+<a class="sourceLine" id="cb1-16" title="16"><span class="va">sha256sums_x86_64=(</span><span class="st">'000000000000000000000000000000000000000000000000000000000000000'</span></a>
+<a class="sourceLine" id="cb1-17" title="17">                   <span class="st">'000000000000000000000000000000000000000000000000000000000000000'</span>)</a>
+<a class="sourceLine" id="cb1-18" title="18"></a>
+<a class="sourceLine" id="cb1-19" title="19"><span class="fu">package()</span> <span class="kw">{</span></a>
+<a class="sourceLine" id="cb1-20" title="20">    <span class="fu">install</span> -Dm755 <span class="st">&quot;</span><span class="va">${srcdir}</span><span class="st">/</span><span class="va">${pkgname}</span><span class="st">-</span><span class="va">${pkgver}</span><span class="st">.AppImage&quot;</span> <span class="st">&quot;</span><span class="va">${pkgdir}</span><span class="st">/opt/</span><span class="va">${pkgname}</span><span class="st">/</span><span class="va">${pkgname}</span><span class="st">.AppImage&quot;</span></a>
+<a class="sourceLine" id="cb1-21" title="21">    <span class="fu">install</span> -Dm644 <span class="st">&quot;</span><span class="va">${srcdir}</span><span class="st">/LICENSE&quot;</span> <span class="st">&quot;</span><span class="va">${pkgdir}</span><span class="st">/opt/</span><span class="va">${pkgname}</span><span class="st">/LICENSE&quot;</span></a>
+<a class="sourceLine" id="cb1-22" title="22"></a>
+<a class="sourceLine" id="cb1-23" title="23">    <span class="co"># Symlink executable</span></a>
+<a class="sourceLine" id="cb1-24" title="24">    <span class="fu">mkdir</span> -p <span class="st">&quot;</span><span class="va">${pkgdir}</span><span class="st">/usr/bin&quot;</span></a>
+<a class="sourceLine" id="cb1-25" title="25">    <span class="fu">ln</span> -s <span class="st">&quot;/opt/</span><span class="va">${pkgname}</span><span class="st">/</span><span class="va">${pkgname}</span><span class="st">.AppImage&quot;</span> <span class="st">&quot;</span><span class="va">${pkgdir}</span><span class="st">/usr/bin/</span><span class="va">${pkgname}</span><span class="st">&quot;</span></a>
+<a class="sourceLine" id="cb1-26" title="26"></a>
+<a class="sourceLine" id="cb1-27" title="27">    <span class="co"># Symlink license</span></a>
+<a class="sourceLine" id="cb1-28" title="28">    <span class="fu">mkdir</span> -p <span class="st">&quot;</span><span class="va">${pkgdir}</span><span class="st">/usr/share/licenses/</span><span class="va">$pkgname</span><span class="st">&quot;</span></a>
+<a class="sourceLine" id="cb1-29" title="29">    <span class="fu">ln</span> -s <span class="st">&quot;/opt/</span><span class="va">$pkgname</span><span class="st">/LICENSE&quot;</span> <span class="st">&quot;</span><span class="va">$pkgdir</span><span class="st">/usr/share/licenses/</span><span class="va">$pkgname</span><span class="st">&quot;</span></a>
+<a class="sourceLine" id="cb1-30" title="30"><span class="kw">}</span></a></code></pre></div>
+<h2 id="why">Why?</h2>
+<p>AppImages are already easy to install and run as noted in <a href="https://superuser.com/a/1307178/109464">this StackOverflow answer</a>. You could just copy the appimage to <code>/usr/local/bin</code> and make it executable with a <code>chmod +x /usr/local/bin/my-project.AppImage</code> so you could run it from the command line. When updating, just replace the AppImage file with the new version. Many AppImage applications notify the user when an update is available.</p>
+<p>This does require each AppImage is updated independently and the user will only know when the application notifies them of an update.</p>
+<h2 id="a-framework-for-managing-many-updates">A framework for managing many updates</h2>
+<p>Using an <a href="https://wiki.archlinux.org/index.php/AUR_helpers">AUR helper</a> all the AppImages can be updated automatically, just like other packages on Arch Linux. For this reason, I will usually go ahead and upload my PKGBUILD to the <a href="https://aur.archlinux.org">AUR</a> if one doesn’t already exist. Others can then take advantage of the script I have already created. See my <a href="../posts/2019-01-30-Opinionated-PKGBUILD-development-guide.html">guide to maintaining PKGBUILDs on the AUR</a>.</p>
+<h2 id="desktop-launcher">Desktop Launcher</h2>
+<p>My template doesn’t install a desktop launcher because when running the AppImage for the first time, it will prompt the user for installing the desktop launcher. On the first run, the user will need to launch the application from the command line. From then on, the AppImage application will be available where the other desktop applications are, if the user selected to install the desktop launcher.</p>
+
+<em>Modified: November 17, 2019 - 07:10:39 PM</em>
+
+            </div>
+
+            <div id="footer">
+                Site proudly generated by <a href="http://github.com/jaspervdj/hakyll">hakyll</a>.<br />
+                Generated HTML hosted on <a href="https://vultr.com">Vultr</a> and maintained with <a href="https://www.ansible.com">Ansible</a>.<br />
+            </div>
+        </div>
+    </body>
+</html>

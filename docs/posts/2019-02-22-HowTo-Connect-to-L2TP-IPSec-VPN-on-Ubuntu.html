@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Dave Parrish - Connecting to L2TP/IPSec VPN with Ubuntu</title>
+
+        <!-- Stylesheets. -->
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+
+        <!-- Metadata. -->
+        <meta name="keywords" content="daveparrish,drupal,haskell,liberty,bitcoin,linux,blog,hakyll" />
+        <meta name="description" content="Dave Parrish - Hakyll blog" />
+    </head>
+    <body>
+        <div id="main">
+            <div id="header">
+                <a href="../">
+                    <img src="../images/lambda.png" alt="lambda" />
+                    Dave Parrish's Blog
+                </a>
+            </div>
+            <!-- Sidebar. -->
+            <div id="sidebar">
+                <a href="../index.html">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../projects.html">Projects</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+
+            </div>
+
+            <div id="content">
+		<h1>Connecting to L2TP/IPSec VPN with Ubuntu</h1>
+                <div class="info">Posted on February 22, 2019</div>
+
+<hr />
+<p><em>TL;DR</em></p>
+<p>These steps <a href="https://github.com/nm-l2tp/network-manager-l2tp/blob/master/README.md#example-workaround-for-3des-sha1-and-modp1024-broken-algorithms">probably</a> work for most off the shelf VPNs using L2TP/IPSec.</p>
+<ol type="1">
+<li>Install the package network-manager-l2tp-gnome with <code>sudo apt install network-manager-l2tp-gnome</code>.</li>
+<li>Enable insecure algorithms if needed. Use ike-scan to find algorithms used by VPN. Set Phase1 and Phase2 Algorithms. In my case I used <code>3des-sha1-modp1024</code> and <code>3des-sha1</code> for Phase1 and Phase2.</li>
+<li>Check <em>only</em> the authentication method you need. In my case I <em>only</em> checked “MSCHAPv2”.</li>
+<li>Enter credentials.</li>
+<li>Still not working? Check error logs with <code>sudo journalctl -f</code> and search error messages. Good Luck!</li>
+</ol>
+<p><strong>EDIT:</strong> Another route to take is to use <a href="https://github.com/ubergarm/l2tp-ipsec-vpn-client">a Docker image</a> to take care of connecting to the VPN.</p>
+<hr />
+<h1 id="introduction">Introduction</h1>
+<p>I’m writing this article out of frustration because my Chromebook connected to the L2TP/IPSec VPN out of the box without any installation or any changing of settings besides user credentials. I wanted to connect with Ubuntu because it is easier to work from Ubuntu than Chrome OS. Eventually I was able to figure out how to configuration Ubuntu 19.04 to connect to the L2TP/IPSec after an hour or two of reading errors logs and searching.</p>
+<h1 id="installation">Installation</h1>
+<p>By default Ubuntu not installed with the VPN software necessary to connect to L2TP/IPSec VPN. The software package you probably will want to install is <a href="https://github.com/nm-l2tp/network-manager-l2tp">network-manager-l2tp</a> which will install <a href="https://www.strongswan.org/">strongSwan</a> and the GUI software (network-manager-l2tp-gnome) to manage the configuration. Run <code>sudo apt install network-manager-l2tp-gnome</code> on the command line to install both network-manager-l2tp and the Gnome GUI to manage the configuration.</p>
+<h1 id="using-insecure-algorithms">Using Insecure Algorithms</h1>
+<p>Here is where I was stuck for awhile because by default network-manager-l2tp will not use the most common algorithms used by many VPN consumer devices. The <a href="https://github.com/nm-l2tp/network-manager-l2tp/blob/master/README.md#example-workaround-for-3des-sha1-and-modp1024-broken-algorithms">reason network-manager-l2tp doesn’t use the algorithms is because they are considered insecure</a>. To force network-manager-l2tp to use insecure algorithms the “Phase1 Algorithms” and “Phase2 Algorithms” need to be set. In my case I put <code>3des-sha1-modp1024</code> for “Phase1 Algorithms” and <code>3des-sha1</code> for “Phase2 Algorithms”. These settings are found in “IPSec Settings…” when creating a VPN under the Network settings in Gnome.</p>
+<p>In order to figure out what algorithms your VPN is expecting use the ike-scan tool which I installed using <code>sudo apt install ike-scan</code>. Then use <code>sudo ike-scan vpn_host_ip</code>. <a href="https://askubuntu.com/a/920497/25776">More information on ike-scan and insecure algorithms commonly used can be found on the linked Ask Ubuntu answer.</a></p>
+<h1 id="pick-authentication-method">Pick Authentication Method</h1>
+<p>It would seem that network-manager-l2tp could not determine which authentication method to use in my case. I needed to uncheck all of the authentication methods except for “MSCHAPv2” in order for the client to connect. I don’t understand why and tried this fix thanks to <a href="https://stackoverflow.com/a/39687810/350221">an answer on Stack Overflow</a>.</p>
+<h1 id="enter-credentials">Enter Credentials</h1>
+<p>This is the only step I expected. It is straight forward. Enter the host IP, the username, the password and pre-shared key in the VPN settings. “Pre-shared key” text field is in the “IPSec Settings…”. You’ll also have to set if you want the password to be stored on Ubuntu 19.04 on the right side of the “Password” text field.</p>
+<h1 id="still-not-connecting">Still not Connecting?</h1>
+<p>I am sorry if your VPN still doesn’t connect. I have only documented what worked for me and tried to leave a trail of the resources which helped me. I don’t understand all the setting for L2TP/IPSec and I don’t understand why things just don’t work by default.</p>
+<p>Please take a look at the logs by running <code>sudo journalctl -f</code> and search for the error message which jump out to you. By trying to connect from the Gnome GUI should produce the errors, if there are any. Good luck!</p>
+<h2 id="edit-docker">EDIT: Docker</h2>
+<p>If all these steps seem too frustrating and you are comfortable with the command line, give a docker image a try. I tried <a href="https://github.com/ubergarm/l2tp-ipsec-vpn-client">ubergarm/l2tp-ipsec-vpn-client</a> which was enough to get connected to the VPN by starting the container with <code>--privileged</code> access on <code>--host</code> network. Here is the Docker Compose configuration I used:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># docker-compose.yaml</span></a>
+<a class="sourceLine" id="cb1-2" title="2"></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="fu">version:</span><span class="at"> </span><span class="st">&quot;3&quot;</span></a>
+<a class="sourceLine" id="cb1-4" title="4"></a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="fu">services:</span></a>
+<a class="sourceLine" id="cb1-6" title="6">  <span class="fu">vpn:</span></a>
+<a class="sourceLine" id="cb1-7" title="7">    <span class="fu">image:</span><span class="at"> ubergarm/l2tp-ipsec-vpn-client</span></a>
+<a class="sourceLine" id="cb1-8" title="8">    <span class="fu">privileged:</span><span class="at"> </span><span class="ch">true</span></a>
+<a class="sourceLine" id="cb1-9" title="9">    <span class="fu">network_mode:</span><span class="at"> host</span></a>
+<a class="sourceLine" id="cb1-10" title="10">    <span class="fu">environment:</span></a>
+<a class="sourceLine" id="cb1-11" title="11">      <span class="fu">VPN_SERVER_IPV4:</span><span class="at"> </span><span class="st">'xxx.xxx.xxx.xxx'</span></a>
+<a class="sourceLine" id="cb1-12" title="12">      <span class="fu">VPN_PSK:</span><span class="at"> </span><span class="st">'shareKey'</span></a>
+<a class="sourceLine" id="cb1-13" title="13">      <span class="fu">VPN_USERNAME:</span><span class="at"> </span><span class="st">'UserName'</span></a>
+<a class="sourceLine" id="cb1-14" title="14">      <span class="fu">VPN_PASSWORD:</span><span class="at"> </span><span class="st">'UserPassword'</span></a>
+<a class="sourceLine" id="cb1-15" title="15">    <span class="fu">volumes:</span></a>
+<a class="sourceLine" id="cb1-16" title="16">      <span class="kw">-</span> <span class="st">&quot;/lib/modules:/lib/modules:ro&quot;</span></a></code></pre></div>
+<p>After starting with <code>docker-compsoe up -d</code> You’ll then need to route your network traffic through the VPN with something like: <code>sudo ip route add 1.2.3.4 via 10.10.10.1 dev ppp0</code>. Please see the <a href="https://github.com/ubergarm/l2tp-ipsec-vpn-client#route">documentation on the GitHub project page</a>.</p>
+<p>I also found this method useful because a service can be added to the Docker Compose configuration without ever enabling the VPN on the host network. This is done by using the <code>vpn</code> service network like so:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb2-1" title="1">  <span class="fu">myservice:</span></a>
+<a class="sourceLine" id="cb2-2" title="2">    <span class="fu">image:</span><span class="at"> apline</span></a>
+<a class="sourceLine" id="cb2-3" title="3">    <span class="fu">network_mode:</span><span class="at"> service:vpn</span></a>
+<a class="sourceLine" id="cb2-4" title="4">    <span class="fu">command:</span><span class="at"> sh -c &quot;while true; do date; sleep 60; done&quot;</span></a></code></pre></div>
+<p>You just need to expose the ports to the service on the <code>vpn</code> service because <code>vpn</code> and <code>myservice</code> effectively share the same IP.</p>
+
+<em>Modified: February 25, 2019 - 08:55:52 AM</em>
+
+            </div>
+
+            <div id="footer">
+                Site proudly generated by <a href="http://github.com/jaspervdj/hakyll">hakyll</a>.<br />
+                Generated HTML hosted on <a href="https://vultr.com">Vultr</a> and maintained with <a href="https://www.ansible.com">Ansible</a>.<br />
+            </div>
+        </div>
+    </body>
+</html>

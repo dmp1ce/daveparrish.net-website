@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Dave Parrish - How I Mine Bitcoin Testnet Coins</title>
+
+        <!-- Stylesheets. -->
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+
+        <!-- Metadata. -->
+        <meta name="keywords" content="daveparrish,drupal,haskell,liberty,bitcoin,linux,blog,hakyll" />
+        <meta name="description" content="Dave Parrish - Hakyll blog" />
+    </head>
+    <body>
+        <div id="main">
+            <div id="header">
+                <a href="../">
+                    <img src="../images/lambda.png" alt="lambda" />
+                    Dave Parrish's Blog
+                </a>
+            </div>
+            <!-- Sidebar. -->
+            <div id="sidebar">
+                <a href="../index.html">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../projects.html">Projects</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+
+            </div>
+
+            <div id="content">
+		<h1>How I Mine Bitcoin Testnet Coins</h1>
+                <div class="info">Posted on September  4, 2020</div>
+
+<hr />
+<p>I wanted about 1 tBTC of Bitcoin Testnet, but I know of no way to puchase testnet coins and getting that much in faucets would take longer than I was willing to spend. Maybe there are better faucets for collecting tBTC which I’m not aware of.</p>
+<p>I would have liked to simply purchase the tBTC but I think selling tBTC is looked down on, which is quite unfortuante, if you ask me. The best I could come up with for getting a lot of tBTC is to mine it directly. Here I explain how I mine Bitcoin testnet.</p>
+<h1 id="overview">Overview</h1>
+<p>My process was to setup a Bitcoin Testnet node. Then I run P2Pool so that I could point a sha256 miner at something that had a pool connection interface. Of course, access to a sha256 miner is needed. A Bitcoin Testnet wallet is also needed for collecting block rewards.</p>
+<h2 id="bitcoin-testnet-node">Bitcoin Testnet node</h2>
+<p>First of all, I need to run a full node running Bitcoin Testnet. I do this using the <a href="https://github.com/dmp1ce/BTC-Privacy-Suite">BTC Privacy Suite</a>. The instructions for getting started are to clone the repository and then <code>./build &amp;&amp; ./start</code>. I first edit the node settings to enable Testnet.</p>
+<ul>
+<li>Change <code>TESTNET_NUM</code> in <code>.env</code> before running <code>./build &amp;&amp; ./start</code>:</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ini"><code class="sourceCode ini"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># testnet for bitcoin and lnd:</span></a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="co"># 0 = testnet off, 1 = testnet on</span></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="dt">TESTNET_NUM</span><span class="ot">=</span><span class="dv">1</span></a></code></pre></div>
+<ul>
+<li><p>Copy <code>overrides/bitcoin-expose-ports.yml.tpl</code> to <code>overrides/bitcoin-expose-ports.yml</code> to expose RPC connection ports to P2Pool.</p></li>
+<li><p>Add the section below in <code>bitcoin_data\bitcoin.conf</code> after running <code>./build &amp;&amp; ./start</code>:</p></li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode ini"><code class="sourceCode ini"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># Some testnet settings needed for 0.19, if using testnet</span></a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="kw">[test]</span></a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="co"># Allow RPC connections from outside of container localhost</span></a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="dt">rpcbind</span><span class="ot">=</span><span class="dv">0</span><span class="st">.</span><span class="dv">0</span><span class="st">.</span><span class="fl">0.0</span></a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="dt">onlynet</span><span class="ot">=</span><span class="st">onion</span></a>
+<a class="sourceLine" id="cb2-6" title="6"><span class="dt">rpcallowip</span><span class="ot">=</span><span class="dv">0</span><span class="st">.</span><span class="dv">0</span><span class="st">.</span><span class="fl">0.0</span><span class="st">/</span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb2-7" title="7"><span class="dt">addnode</span><span class="ot">=</span><span class="st">va5vwn2ennpkjj2o.onion:</span><span class="dv">18333</span></a></code></pre></div>
+<p>The <code>addnode</code> section will help testnet to connect through Tor only.</p>
+<p>I also set the <code>rpcuser</code> and <code>rpcpassword</code> to something other than the default. The P2Pool connects to Bitcoin core through RPC.</p>
+<h2 id="p2pool-node">P2Pool node</h2>
+<p>I then need an interface to connect an S17 miner. An S17 Miner cannot directly connect to bitcoin core, that I am aware of. I run the P2Pool software to allow the miner to get work and and mine new blocks. I <a href="https://github.com/dmp1ce/p2pool-DOCKERFILE">created a Dockerfile which can setup a version of P2Pool</a> which works on Bitcoin (BTC) and testnet.</p>
+<p>To use the p2pool Docker repository I clone the repository with <code>git clone https://github.com/dmp1ce/p2pool-DOCKERFILE</code>. Then I build the Docker image and use a <code>docker run</code> command to connect to the Bitcoin full node and listen for mining connections.</p>
+<p>I use <code>docker build --pull -t p2pool ./</code> to build the image and then <code>docker run -d -p 19332:19332 -p 19333:19333 -it --rm p2pool --testnet --bitcoind-address $BTC_NODE_IP -a $BTC_ADDRESS --net bitcoin $RPC_USER $RPC_PASSWORD</code> to run the node. I use <code>docker logs -f</code> to view the real-time logs. I use <code>docker ps</code> to find the name of the container of the logs I need to view.</p>
+<ul>
+<li><code>$BTC_NODE_IP</code>: Is the IP address to the full node. Something like <code>192.168.1.55</code>.</li>
+<li><code>$BTC_ADDRESS</code>: Is the P2PKH BTC Testnet address generated from Electrum. Something like <code>n1mexdG58xWmgwBc3qBrDRwWMEYqiReLEb</code>.</li>
+<li><code>$RPC_USER</code>: Is the RPC user. Something like <code>bob</code>.</li>
+<li><code>$RPC_PASSWORD</code> Is the RPC password. Something like <code>SUPER secret PASSWORD 123456</code>.</li>
+</ul>
+<h2 id="sha256-miner">SHA256 Miner</h2>
+<p>Thanks to a kind miner, I was able to use a S17 AntMiner for a few hours, in order to test my setup and generate some testnet coins. Other minering devices, such as S9 Antminers should have similar setups.</p>
+<p>As explained in the <a href="https://github.com/jtoomim/p2pool/blob/155022fc942ec45778a95622766a9b11d923e76e/README.md">instructions from P2Pool README</a> I use <code>stratum+tcp://$BTC_NODE_IP:19332</code> for the URL field where <code>$BTC_NODE_IP</code> is the node IP running the P2Pool software. I use the same BTC address generated from Electrum for the “Worker” field. The GUI looks something like this: <img src="../images/2020-09/S17-AntMiner-configuration.png" alt="S17 AntMiner Testnet configuration with P2Pool" /></p>
+<h2 id="bitcoin-testnet-wallet">Bitcoin Testnet wallet</h2>
+<p>Running the Electrum on Testnet requires running with the <code>--testnet</code> flag. So, on the command line, it looks like this <code>electrum --testnet</code> on Arch Linux. Once Electrum, is running, addresses can be generated the usual way but on testnet they will look different. I wasn’t sure what type of addresses were compatible with mining and P2Pool, so I used the legacy (P2PKH) addresses. See <a href="https://en.bitcoin.it/wiki/Address">Bitcoin address types in the bitcoin wiki</a> if you get confused about address types like me, but remember testnet addresses will look different than mainnet.</p>
+<h1 id="mining-results">Mining results</h1>
+<p>Soon was able to see transactions coming into my Electrum wallet! After about 30 minutes of generating blocks I had about 2 tBTC. I was surprised they were much smaller rewards than the mainnet. Only about 0.2 tBTC per block. The reason for the small reward is the testnet has many more mined blocks, and therefore has had many more reward adjustments. Also, there are not many mining fees being collected as compared to mainnet.</p>
+<p>S17 Antminers are quite powerful at the time of writing, so I could easily solo mine testnet until I had all the coins I wanted. If you are not lucky enough to have access to a S17 Miner then you could give a mining rental service a try such as <a href="https://www.miningrigrentals.com/?ref=34746">MiningRigRentals.com</a>. You will need to forward your P2Pool connection port to the internet so that the mining rental service can access your P2Pool node.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>That was everything I needed to get coins mined on Bitcoin Testnet. I hope you found my write-up helpful. Happy hashing! ⛏</p>
+
+<em>Modified: September 19, 2020 - 06:55:44 PM</em>
+
+            </div>
+
+            <div id="footer">
+                Site proudly generated by <a href="http://github.com/jaspervdj/hakyll">hakyll</a>.<br />
+                Generated HTML hosted on <a href="https://vultr.com">Vultr</a> and maintained with <a href="https://www.ansible.com">Ansible</a>.<br />
+            </div>
+        </div>
+    </body>
+</html>

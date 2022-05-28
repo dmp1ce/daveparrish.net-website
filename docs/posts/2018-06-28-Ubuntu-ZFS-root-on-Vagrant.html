@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Dave Parrish - Ubuntu ZFS root on Vagrant</title>
+
+        <!-- Stylesheets. -->
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+
+        <!-- Metadata. -->
+        <meta name="keywords" content="daveparrish,drupal,haskell,liberty,bitcoin,linux,blog,hakyll" />
+        <meta name="description" content="Dave Parrish - Hakyll blog" />
+    </head>
+    <body>
+        <div id="main">
+            <div id="header">
+                <a href="../">
+                    <img src="../images/lambda.png" alt="lambda" />
+                    Dave Parrish's Blog
+                </a>
+            </div>
+            <!-- Sidebar. -->
+            <div id="sidebar">
+                <a href="../index.html">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../projects.html">Projects</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+
+            </div>
+
+            <div id="content">
+		<h1>Ubuntu ZFS root on Vagrant</h1>
+                <div class="info">Posted on June 28, 2018</div>
+
+<p>When building my local server, which runs a variety of services using <a href="https://en.wikipedia.org/wiki/Docker_%28software%29">Docker</a>, I wanted to make sure I had a dependable file system. Of course I chose <a href="https://en.wikipedia.org/wiki/ZFS">ZFS</a>. For my first server I used <a href="https://en.wikipedia.org/wiki/Ext4">ext4 filesystem</a> as the root partition and only used ZFS for storing the application data which the services depended. <a href="https://serverfault.com/a/798692/156354">This is the recommended approach by many.</a> However, I want the additional benefits of having the entire root partition using ZFS. The benefits include:</p>
+<ul>
+<li>Drive redundancy on the system level files such as <code>/boot</code> and <code>/var</code></li>
+<li><a href="https://en.wikipedia.org/wiki/ZFS#Snapshots">Snapshots</a> of the entire system</li>
+<li><a href="https://docs.docker.com/storage/storagedriver/zfs-driver/">Docker using ZFS storage driver</a></li>
+<li>Needing one less drive used only for root</li>
+</ul>
+<p>To test my ideas before buying the hardware needed to run the server I needed to <a href="https://en.wikipedia.org/wiki/Virtual_machine">virtualize the environment</a>. I really wanted to use <a href="https://en.wikipedia.org/wiki/Ubuntu_version_history#Ubuntu_18.04_LTS_(Bionic_Beaver)">Ubuntu 18.04</a> because it has <a href="https://github.com/zfsonlinux/zfs/wiki/Ubuntu-18.04-Root-on-ZFS">community support for ZFS</a>. The problem is that <a href="https://en.wikipedia.org/wiki/Vagrant_%28software%29">Vagrant</a> has no Ubuntu 18.04 ZFS root boxes available for me to test with.</p>
+<p>At first I researched <a href="https://blog.codeship.com/packer-vagrant-tutorial/">how to create a Vagrant box from an Ubuntu install ISO</a> but I quickly became stuck when I realized <a href="https://www.ubuntu.com/community/debian">Debain</a> has not shipped the <a href="https://packages.debian.org/sid/partman-zfs">partman-zfs</a> package which is needed to partition a disk with ZFS on install. Theoretically, it should still be possible to script the root ZFS install within <a href="https://www.packer.io/intro/getting-started/vagrant.html">Packer</a> using shell commands, but that sounded too error prone and tedious for my liking. I also was unsure how to configure the <a href="https://wiki.debian.org/DebianInstaller/Preseed">preseed.cfg</a> to make the installer do what I wanted. Maybe it would have been a better use of my time to work on whatever issues are holding back partman-zfs as that is what should really be doing all the lower level partitioning work.</p>
+<p>Eventually, I decided to take a <a href="https://app.vagrantup.com/ubuntu/boxes/bionic64">currently working Ubuntu 18.04 Vagrant box</a> and migrate the filesystem root to a ZFS root partition. The steps I used were:</p>
+<ol type="1">
+<li>Initialize a Vagrantfile with Ubuntu 18.04 base</li>
+<li>Creates an additional disk for the VM</li>
+<li>Partition the new disk for ZFS</li>
+<li>Create the ZFS root pool</li>
+<li>Copy the root system to the ZFS root pool</li>
+<li>Make the ZFS root pool bootable</li>
+<li>Reboot</li>
+</ol>
+<p>Feel free to view my <a href="https://github.com/dmp1ce/ubuntu-root-ZFS">source to build the box</a> or <a href="https://app.vagrantup.com/dmp1ce/boxes/ubuntu1804zfs">start using the box right away</a>.</p>
+<p>I am happy with the results as I can test all the features of ZFS and how they effect the root Ubuntu system. In particular, I’m curious how docker will perform with ZFS as the storage driver.</p>
+<p>In the future I would like to mirror sda and sdc disks. Maybe someone could help me create a Vagrant box from the Ubuntu install ISO as I would prefer a clean root ZFS install over the solution I came up with.</p>
+<p>Have fun testing ZFS based Ubuntu setups!</p>
+<p>I used the following guides heavily in creating this post.</p>
+<ul>
+<li><a href="https://blog.heckel.xyz/2016/12/31/move-existing-linux-install-zfs-root/">Move Existing Linux Install to ZFS root</a></li>
+<li><a href="https://github.com/zfsonlinux/zfs/wiki/Ubuntu-18.04-Root-on-ZFS">Ubuntu 18.04 Root on ZFS</a></li>
+</ul>
+
+<em>Modified: June 28, 2018 - 02:28:59 PM</em>
+
+            </div>
+
+            <div id="footer">
+                Site proudly generated by <a href="http://github.com/jaspervdj/hakyll">hakyll</a>.<br />
+                Generated HTML hosted on <a href="https://vultr.com">Vultr</a> and maintained with <a href="https://www.ansible.com">Ansible</a>.<br />
+            </div>
+        </div>
+    </body>
+</html>

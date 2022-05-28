@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Dave Parrish - Gotchas When Creating a Snap Package for Haskell (Stack) Program</title>
+
+        <!-- Stylesheets. -->
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+
+        <!-- Metadata. -->
+        <meta name="keywords" content="daveparrish,drupal,haskell,liberty,bitcoin,linux,blog,hakyll" />
+        <meta name="description" content="Dave Parrish - Hakyll blog" />
+    </head>
+    <body>
+        <div id="main">
+            <div id="header">
+                <a href="../">
+                    <img src="../images/lambda.png" alt="lambda" />
+                    Dave Parrish's Blog
+                </a>
+            </div>
+            <!-- Sidebar. -->
+            <div id="sidebar">
+                <a href="../index.html">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../projects.html">Projects</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+
+            </div>
+
+            <div id="content">
+		<h1>Gotchas When Creating a Snap Package for Haskell (Stack) Program</h1>
+                <div class="info">Posted on August 16, 2019</div>
+
+<h1 id="introduction">Introduction</h1>
+<p>Building snap packages and publishing them on the <a href="https://snapcraft.io/store">Snapcraft Store</a> is <a href="https://snapcraft.io/docs/snapcraft-overview">well documented</a> by Canonical. For the most part, creating a snap package for a <a href="https://www.haskell.org/">Haskell</a> program (built with <a href="https://docs.haskellstack.org/en/stable/README/">Stack</a>) is the same as building any other Snap package. However, I did need to know a few things to successfully build my Snap package.</p>
+<h1 id="ghc-memory-requirements">GHC Memory Requirements</h1>
+<p><a href="https://www.haskell.org/ghc/">GHC</a> is a memory hog. Many libraries can take over 4 GB of memory to compile. By default, snapcraft will only allocate 2 GB of memory when building an application with <a href="https://multipass.run/">multipass</a>. Multipass gets used by snapcraft when <a href="https://snapcraft.io/docs/snapcraft-top-level-metadata">core18</a> is specified in the <code>snapcraft.yaml</code> as a base.</p>
+<p>To change the memory allocated by multipass, use an <a href="https://forum.snapcraft.io/t/environment-variables-that-snapcraft-consumes/9416">snapcraft environment variable</a>, when running snapcraft. The snapcraft command will look like, <code>SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=4G snapcraft</code>, to allocate 4 GB. If snapcraft already ran with lower memory then you’ll need to rebuild the multipass VM by running <code>snapcraft clean</code> first.</p>
+<h1 id="using-stack-tool-in-snapcraft">Using Stack tool in Snapcraft</h1>
+<p>Many Haskell applications build using the stack tool. There is not a snapcraft plugin available for the stack tool so a build override is needed. The following snippet will download and install stack. Next the snippet will build the program with stack.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">override-build:</span> <span class="st">|</span></a>
+<a class="sourceLine" id="cb1-2" title="2">  if [ ! -x &quot;$(command -v stack)&quot; ]; then</a>
+<a class="sourceLine" id="cb1-3" title="3">    curl -sSL https://get.haskellstack.org/ | sh</a>
+<a class="sourceLine" id="cb1-4" title="4">  fi</a>
+<a class="sourceLine" id="cb1-5" title="5">  stack build --copy-bins</a></code></pre></div>
+<p>Use <code>plugin: nil</code> for the part building the Haskell program.</p>
+<p>Also, make sure <code>curl</code> and any other build dependencies you need are in the <code>build-packages</code> section.</p>
+<h1 id="finding-the-binary">Finding the binary</h1>
+<p>By default the binary will be stored in <code>/root/.local/bin</code> from running <code>stack buidl --copy-bins</code>. It is probably more convenient for the application to be in <code>/bin</code>. Use <code>organize</code> to move the binary were it is needed for the snap. For example:</p>
+<pre><code>organize:
+  /root/.local/bin/myapp: bin/myapp</code></pre>
+<h1 id="automatic-versioning">Automatic Versioning</h1>
+<p>Snapcraft can use the same version specified in the <code>package.yaml</code> like so:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">override-pull:</span> <span class="st">|</span></a>
+<a class="sourceLine" id="cb3-2" title="2">  snapcraftctl pull</a>
+<a class="sourceLine" id="cb3-3" title="3">  snapcraftctl set-version &quot;$(grep version package.yaml | awk '{ print $NF }')&quot;</a></code></pre></div>
+<p>Use <code>adopt-info</code> in the <code>snapcraft.yaml</code> to <a href="https://snapcraft.io/docs/using-external-metadata">select the part to use the version</a> info from.</p>
+<h1 id="example">Example</h1>
+<p>For a working example, see my <a href="https://github.com/dmp1ce/s17-turbo-switch/blob/master/snap/snapcraft.yaml">s17-turbo-switch snap configuration</a>.</p>
+
+<em>Modified: August 16, 2019 - 06:24:50 PM</em>
+
+            </div>
+
+            <div id="footer">
+                Site proudly generated by <a href="http://github.com/jaspervdj/hakyll">hakyll</a>.<br />
+                Generated HTML hosted on <a href="https://vultr.com">Vultr</a> and maintained with <a href="https://www.ansible.com">Ansible</a>.<br />
+            </div>
+        </div>
+    </body>
+</html>

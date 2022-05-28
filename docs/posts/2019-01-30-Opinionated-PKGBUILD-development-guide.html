@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Dave Parrish - Opinionated AUR maintainer guide</title>
+
+        <!-- Stylesheets. -->
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+
+        <!-- Metadata. -->
+        <meta name="keywords" content="daveparrish,drupal,haskell,liberty,bitcoin,linux,blog,hakyll" />
+        <meta name="description" content="Dave Parrish - Hakyll blog" />
+    </head>
+    <body>
+        <div id="main">
+            <div id="header">
+                <a href="../">
+                    <img src="../images/lambda.png" alt="lambda" />
+                    Dave Parrish's Blog
+                </a>
+            </div>
+            <!-- Sidebar. -->
+            <div id="sidebar">
+                <a href="../index.html">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../projects.html">Projects</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+
+            </div>
+
+            <div id="content">
+		<h1>Opinionated AUR maintainer guide</h1>
+                <div class="info">Posted on January 30, 2019</div>
+
+<h1 id="introduction">Introduction</h1>
+<p>I learned most of what I know about developing and maintaining an Arch Linux package by reading <a href="https://wiki.archlinux.org/index.php/Creating_packages">documentation on the Arch Linux Wiki</a> and by studying <a href="https://aur.archlinux.org/packages/">several example packages posted on the Arch User Repository</a>. Later I discovered tools to make maintaining packages easier to develop, less prone to errors and more inline with community standards.</p>
+<h1 id="terms">Terms</h1>
+<ul>
+<li><a href="https://www.archlinux.org/">Arch Linux</a> — Rolling Linux distro based on the Pacman package manager. This post only applies to Arch Linux derived operating systems.</li>
+<li>PKGBUILD — The source file used to build the Arch Linux package. It is a shell script. I often use PKGBUILD and Arch Linux Package synonymously.</li>
+<li><a href="https://aur.archlinux.org/">AUR</a> — The Arch User Repository. Where most non-offical user created packages are centrally stored.</li>
+</ul>
+<h1 id="tools">Tools</h1>
+<ul>
+<li><a href="https://aur.archlinux.org/packages/clean-chroot-manager/">clean-chroot-manager</a> — Command line tool for building PKGBUILD scripts in a clean environment. Also <code>ccm64</code> or <code>ccm32</code> on the command line.</li>
+<li><a href="https://wiki.archlinux.org/index.php/VirtualBox">VirtualBox</a> — Convenient virtual machine software for testing packages.</li>
+<li><a href="https://wiki.archlinux.org/index.php/Spacemacs">Spacemacs</a> — The editor I use for editing the PKGBUILD source. Any editor should work but Spacemacs checks syntax with <a href="https://www.archlinux.org/packages/community/x86_64/shellcheck/">shellcheck</a> and provides syntax highlighting.</li>
+<li><a href="https://wiki.archlinux.org/index.php/Git">git</a> — Source control tool used to publish to the AUR.</li>
+</ul>
+<h1 id="process">Process</h1>
+<p>Usually I am creating PKGBUILDs for software projects which I use but are not available as a package in Arch Linux. What I first need to do is figure out how the project is built by reading the project’s documentation and then I’ll craft my own PKGBUILD or copy another PKGBUILD which is close to what I need. If you don’t have any PKGBUILD examples, I suggest looking through the <a href="https://aur.archlinux.org/packages/">AUR packages</a>.</p>
+<p>Please make sure the package you want to create isn’t available already on the AUR. See the <a href="#naming">naming</a> section.</p>
+<h2 id="editing">Editing</h2>
+<p>I use the Spacemacs editor to craft the <code>PKGBUILD</code> file to my needs. To get Spacemacs to work for PKGBUILDs, you’ll need to:</p>
+<ul>
+<li><a href="https://wiki.archlinux.org/index.php/Spacemacs#Install_Emacs">Install Spacemacs</a></li>
+<li>Install <a href="https://www.archlinux.org/packages/community/x86_64/shellcheck/">shellcheck</a> (<code>pacman -S shellcheck</code>)</li>
+<li>Enable the <a href="http://develop.spacemacs.org/layers/+lang/shell-scripts/README.html">Shell Scripts layer</a> in Spacemacs</li>
+<li>Turn on <code>shell-script-mode</code> in Spacemacs while editing the <code>PKGBUILD</code>.</li>
+</ul>
+<p>You’ll then be able to start modifying the shell commands without needing to worry about common mistakes, which the syntax highlighter and shellcheck will show you in Spacemacs.</p>
+<h2 id="building">Building</h2>
+<p>When building the PKGBUILD, you should be careful not to assume other Arch Linux users will have the same packages installed as you do. In order to test in a “clean” environment, I use <a href="https://aur.archlinux.org/packages/clean-chroot-manager/">clean-chroot-manager</a>. clean-chroot-manager will create a clean chroot environment and build the PKGBUILD in that environment.</p>
+<h3 id="tmpfs">tmpfs</h3>
+<p>I wanted to build packages completely in memory in order to avoid unnessary disk usage and speed up builds. In order to do this <code>ccm64</code> (clean-chroot-manager) creates a <code>~/.conf/clean-chroot-manager.conf</code> file which can be configured to build in a custom directory. I set that directory to be <code>/mnt/chroot64</code> and I made that directory a <a href="https://wiki.archlinux.org/index.php/Tmpfs">tmpfs partition</a>. In order to create the tmpfs partition I have the following entry in my <code>/etc/fstab</code> file.</p>
+<pre><code># AUR development chroot
+tmpfs	/mnt/chroot64	tmpfs	mode=1777,strictatime,nodev,size=10G 0 0</code></pre>
+<p>This entry will create a 10-gigabyte tmpfs partition on reboot. Make sure your system has enough memory before doing this! This partition can also be manually mounted with <code>mount /mnt/chroot64</code>.</p>
+<h3 id="chroot">chroot</h3>
+<p>Once <code>ccm64</code> is configured how you want, you can setup a chroot in your PKGBUILD directory by running <code>ccm64 c</code>. You’ll need to be the root user in order for the command to work. I always use <code>sudo ccm64</code>.</p>
+<p>Use <code>ccm64 s</code> to build the PKGBUILD. A successful build will leave a <code>.tar.xz</code> file as well as several log files. If there are other AUR dependencies, then they can be added by building in another directory and adding with <code>ccm64 a</code>.</p>
+<p>Take note of the <a href="https://wiki.archlinux.org/index.php/Namcap">namcap</a> errors, as namcap is good at finding errors in the PKGBUILD that aren’t always obvious, such as dependencies which are missing or not needed.</p>
+<h2 id="testing">Testing</h2>
+<p>For many packages it may be perfectly fine to test on your host OS. However, often I find it helpful to install on a VirtualBox VM to make sure it installs and runs as expected in a newly installed desktop environment. I used an <a href="https://antergos.com/try-it/">Antergos ISO</a> to quickly get an Arch Linux distro installed. I then created a snapshot of the “clean” environment so I can reset back to a “clean” state every time I want to test a new package.</p>
+<p>I did have some trouble sharing my <code>.tar.xz</code> files with the VirtualBox VM using guest additions so I ended up using sshfs to send the file to the guest. In order to do this, you’ll need to run <a href="https://wiki.archlinux.org/index.php/OpenSSH#Daemon_management">sshd on the guest</a> and then <a href="https://wiki.archlinux.org/index.php/SSHFS#Mounting">connect sshfs to the guest from the host</a>. I created a simple script mount sshfs for me:</p>
+<pre><code>#!/bin/bash
+sshfs -p 3022 dave@localhost:/home/dave/aur_drop /home/david/Workspace/aur/guest_drop
+</code></pre>
+<p>Some things I check for in the VM are:</p>
+<ul>
+<li>Is the desktop icon showing up correctly?</li>
+<li>Is the desktop icon launching the application?</li>
+<li>Is the application running as expected?</li>
+<li>Is the application missing any dependencies at runtime which are causing it to fail?</li>
+</ul>
+<h2 id="publishing">Publishing</h2>
+<p>Once you are sure your PKGBUILD is ready to share with others, you’ll want to publish it to the AUR. Here are the steps to publish:</p>
+<ul>
+<li>Find an available name in the AUR.</li>
+<li>Generate a <code>.SRCINFO</code> file.</li>
+<li>Initialize a git repository with the correct remote.</li>
+<li>Commit code changes.</li>
+<li>Push the code to the AUR.</li>
+</ul>
+<h3 id="naming">Naming</h3>
+<p>No two packages on the AUR can have the same name. Most of the time this isn’t a problem because often if someone wants to create a package based on the latest git commit or latest binary release, they can create a <a href="https://wiki.archlinux.org/index.php/Arch_User_Repository#What_is_the_difference_between_foo_and_foo-git_packages?">new package with a suffix</a> such as <code>-git</code> or <code>-bin</code>. The name chosen needs to also be included in the <code>PKGBUILD</code> as the <code>pkgname</code> variable value.</p>
+<h3 id="git">Git</h3>
+<p>Once an unused name is chosen, initialize a git repository (if you haven’t done so already) and create an upstream remote like so:</p>
+<pre><code>git init
+git remote add origin ssh://aur@aur.archlinux.org/$(EXAMPLE).git</code></pre>
+<p>Replace <code>$(EXAMPLE)</code> with the name of your package.</p>
+<p>Commit your <code>PKGBUILD</code> and <code>.SRCINFO</code> files (along with any other source files you need for your package) with git. I use <a href="https://www.emacswiki.org/emacs/Magit">maggit</a> in Spacemacs as a front-end to git but this isn’t necessary.</p>
+<p>Then push your code to the AUR using git. For example <code>git push origin master</code>. You will need to both have created an AUR account and <a href="https://wiki.archlinux.org/index.php/Arch_User_Repository#Authentication">uploaded your SSH key</a> for the push to work.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>At this point you should have a published package on the AUR, which users can install manually with <code>makepkg</code> or use one of the several <a href="https://wiki.archlinux.org/index.php/AUR_helpers">AUR helpers</a> to install. The AUR allows for flagging a package when out-of-date and comments when something isn’t working right. So, expect feedback about your package if it is used and left unmaintained. Don’t worry, you can disown or delete an unmaintained package, but try to keep it up-to-date based on feedback and recent releases.</p>
+<p>Have fun and feel free to ask me for help if you get stuck.</p>
+
+<em>Modified: January 30, 2019 - 08:35:36 PM</em>
+
+            </div>
+
+            <div id="footer">
+                Site proudly generated by <a href="http://github.com/jaspervdj/hakyll">hakyll</a>.<br />
+                Generated HTML hosted on <a href="https://vultr.com">Vultr</a> and maintained with <a href="https://www.ansible.com">Ansible</a>.<br />
+            </div>
+        </div>
+    </body>
+</html>
