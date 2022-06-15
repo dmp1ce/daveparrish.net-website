@@ -37,7 +37,7 @@
 
 <p>If you are like me and you don’t want to depend on any services if you don’t have to, you might have wanted to run your own Git repository. You might have also wanted to encrypt your repository. In my case, I’m using <a href="https://plaintextaccounting.org/">plain text accounting</a> and managing the changes to the ledger with <a href="https://git-scm.com/">Git</a>. Here are the components I used to create my own encrypted Git repository.</p>
 <p>The easy way to get encrypted Git repositories to use the excellent <a href="https://keybase.io/blog/encrypted-git-for-everyone">Keybase</a> services. In my case, I already had a private Git server setup using <a href="http://gitolite.com/gitolite/">Gitolite</a>. I used <a href="https://www.docker.com/what-docker">Docker</a>, <a href="https://docs.docker.com/compose/">docker-compose</a> and <a href="https://github.com/dmp1ce/decompose-gitolite">some home grown bash scripting</a> to setup the Gitolite service on <a href="https://www.vultr.com/">Vultr</a> infrastructure. Since I already had the Git service, it was just a matter of encrypted the data before it goes to the server. For encrypting push and decrypting pull commands I am using <a href="https://github.com/spwhitton/git-remote-gcrypt">git-remote-gcrypt</a>. I had looked at <a href="https://www.agwa.name/projects/git-crypt/">git-crypt</a> but it seems that git-crypt is better for encrypting a few files while git-remote-gcrypt is better for encrypting the entire repository. The only encryption method available for git-remote-gcrypt is <a href="https://gnupg.org/">GPG</a>, which is OK with me, but it would have been nice to have the option for symmetric encryption with a passphrase file.</p>
-<p>To install, all I needed to do was <code>apt install git-remote-gcrypt</code> on <a href="https://www.ubuntu.com/community/debian">Debian/Ubuntu</a> but I could also easily install on a <a href="https://en.wikipedia.org/wiki/MacOS">Mac</a> using the <code>install.sh</code> script. The install script is only copying a <a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks">Git hook</a>.</p>
+<p>To install, all I needed to do was <code>apt install git-remote-gcrypt</code> on <a href="https://www.ubuntu.com/community/debian">Debian/Ubuntu</a>. I could also easily install on a <a href="https://en.wikipedia.org/wiki/MacOS">Mac</a> using the Homebrew package manager with the command <code>brew install git-remote-gcrypt</code>. Using a package manager is prefered to help keep the git hook up-to-date.</p>
 <p>Once installed, you’ll need need to specify the GPG keys to use for encrypting the data. First create the remote.</p>
 <pre><code>git remote add cryptremote gcrypt::rsync://example.com:repo</code></pre>
 <p>Then set the participants keys.</p>
@@ -47,7 +47,7 @@
 <p>At this point, your push commands to the <code>cryptremote</code> repository will be encrypted using the participants keys and fetches will be decrypted using your private key.</p>
 <p>Make sure the users of the Git repository have rewrite permissions. In Gitolite, <code>RW+</code> gives users the permission to rewrite history. Rewrite permission is important for git-remote-gcrypt because each push is a complete rewrite of history. Be careful to pull before pushing or else you will override the latest pushed changes! The other participant would need to push their changes again.</p>
 
-<em>Modified: June 12, 2018 - 03:34:58 PM</em>
+<em>Modified: June 15, 2022 - 07:48:33 PM</em>
 
             </div>
 
