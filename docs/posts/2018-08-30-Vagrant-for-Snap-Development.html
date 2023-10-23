@@ -37,23 +37,23 @@
 
 <p><strong><em>EDIT: Most likely these instructions no longer work for developing Snaps if you are using <code>base: core18</code>. If a base is specified then <a href="https://github.com/CanonicalLtd/multipass">multipass</a> is used to emulate the environment using KVM which is not supported by VirtualBox. Please try simply the <code>snapcraft</code> command on physical hardware first.</em></strong></p>
 <p>The only way I have found to develop Snap packages on Arch Linux is to use a Ubuntu 16.04 virtual machine to do the development. Getting the vagrant machine is straight forward. You’ll first need to add the image to the <code>Vagrantfile</code> like so:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># All Vagrant configuration is done below. The &quot;2&quot; in Vagrant.configure</span></a>
-<a class="sourceLine" id="cb1-2" title="2"><span class="co"># configures the configuration version (we support older styles for</span></a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="co"># backwards compatibility). Please don't change it unless you know what</span></a>
-<a class="sourceLine" id="cb1-4" title="4"><span class="co"># you're doing.</span></a>
-<a class="sourceLine" id="cb1-5" title="5"><span class="dt">Vagrant</span>.configure(<span class="st">&quot;2&quot;</span>) <span class="kw">do</span> |config|</a>
-<a class="sourceLine" id="cb1-6" title="6">  <span class="co"># Every Vagrant development environment requires a box. You can search for</span></a>
-<a class="sourceLine" id="cb1-7" title="7">  <span class="co"># boxes at https://vagrantcloud.com/search.</span></a>
-<a class="sourceLine" id="cb1-8" title="8">  config.vm.box = <span class="st">&quot;ubuntu/xenial64&quot;</span></a>
-<a class="sourceLine" id="cb1-9" title="9"></a>
-<a class="sourceLine" id="cb1-10" title="10">  <span class="co"># Provider-specific configuration so you can fine-tune various</span></a>
-<a class="sourceLine" id="cb1-11" title="11">  <span class="co"># backing providers for Vagrant. These expose provider-specific options.</span></a>
-<a class="sourceLine" id="cb1-12" title="12">  <span class="co"># Example for VirtualBox:</span></a>
-<a class="sourceLine" id="cb1-13" title="13">  config.vm.provider <span class="st">&quot;virtualbox&quot;</span> <span class="kw">do</span> |vb|</a>
-<a class="sourceLine" id="cb1-14" title="14">    <span class="co"># Customize the amount of memory on the VM:</span></a>
-<a class="sourceLine" id="cb1-15" title="15">    vb.memory = <span class="st">&quot;4096&quot;</span></a>
-<a class="sourceLine" id="cb1-16" title="16">  <span class="kw">end</span></a>
-<a class="sourceLine" id="cb1-17" title="17"><span class="kw">end</span></a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># All Vagrant configuration is done below. The &quot;2&quot; in Vagrant.configure</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># configures the configuration version (we support older styles for</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># backwards compatibility). Please don't change it unless you know what</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># you're doing.</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Vagrant</span><span class="at">.configure</span>(<span class="st">&quot;2&quot;</span>) <span class="cf">do</span> <span class="kw">|</span>config<span class="kw">|</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Every Vagrant development environment requires a box. You can search for</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># boxes at https://vagrantcloud.com/search.</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  config<span class="at">.vm.box</span> <span class="kw">=</span> <span class="st">&quot;ubuntu/xenial64&quot;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Provider-specific configuration so you can fine-tune various</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># backing providers for Vagrant. These expose provider-specific options.</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Example for VirtualBox:</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  config<span class="at">.vm.provider</span> <span class="st">&quot;virtualbox&quot;</span> <span class="cf">do</span> <span class="kw">|</span>vb<span class="kw">|</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Customize the amount of memory on the VM:</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    vb<span class="at">.memory</span> <span class="kw">=</span> <span class="st">&quot;4096&quot;</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div>
 <p>I’ve also upped the memory to 4 GB because I was getting some out of memory errors on a Snap build.</p>
 <p>Now you should be able to <code>vagrant up</code> and <code>vagrant ssh</code> to enter the vagrant VM and work on the snap.</p>
 <p>The only other caveat is that you’ll not be able to build the Snap in <code>/vagrant</code> which is where the VM shares files with the host. You’ll need to copy your <code>snapcraft.yml</code> file into another directory. I create a <code>~/projects/mySnapProject</code> directory to hold my Snap projects. I would then copy the <code>snapcraft.yml</code> and other project files into the <code>~/projects/mySnapProject</code> directory.</p>
@@ -65,7 +65,7 @@
 <li><a href="https://forum.snapcraft.io/t/cleanbuild-fails-differently-locally-than-on-snapcraft-io/7048?u=dmp1ce">Cleanbuild fails differently locally than on snapcraft.io</a></li>
 </ul>
 
-<em>Modified: January 29, 2019 - 07:54:08 PM</em>
+<em>Modified: January 29, 2019 - 08:54:08 PM</em>
 
             </div>
 

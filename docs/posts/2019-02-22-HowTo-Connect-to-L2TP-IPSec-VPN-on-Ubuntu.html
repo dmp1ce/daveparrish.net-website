@@ -63,31 +63,31 @@
 <p>Please take a look at the logs by running <code>sudo journalctl -f</code> and search for the error message which jump out to you. By trying to connect from the Gnome GUI should produce the errors, if there are any. Good luck!</p>
 <h2 id="edit-docker">EDIT: Docker</h2>
 <p>If all these steps seem too frustrating and you are comfortable with the command line, give a docker image a try. I tried <a href="https://github.com/ubergarm/l2tp-ipsec-vpn-client">ubergarm/l2tp-ipsec-vpn-client</a> which was enough to get connected to the VPN by starting the container with <code>--privileged</code> access on <code>--host</code> network. Here is the Docker Compose configuration I used:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># docker-compose.yaml</span></a>
-<a class="sourceLine" id="cb1-2" title="2"></a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="fu">version:</span><span class="at"> </span><span class="st">&quot;3&quot;</span></a>
-<a class="sourceLine" id="cb1-4" title="4"></a>
-<a class="sourceLine" id="cb1-5" title="5"><span class="fu">services:</span></a>
-<a class="sourceLine" id="cb1-6" title="6">  <span class="fu">vpn:</span></a>
-<a class="sourceLine" id="cb1-7" title="7">    <span class="fu">image:</span><span class="at"> ubergarm/l2tp-ipsec-vpn-client</span></a>
-<a class="sourceLine" id="cb1-8" title="8">    <span class="fu">privileged:</span><span class="at"> </span><span class="ch">true</span></a>
-<a class="sourceLine" id="cb1-9" title="9">    <span class="fu">network_mode:</span><span class="at"> host</span></a>
-<a class="sourceLine" id="cb1-10" title="10">    <span class="fu">environment:</span></a>
-<a class="sourceLine" id="cb1-11" title="11">      <span class="fu">VPN_SERVER_IPV4:</span><span class="at"> </span><span class="st">'xxx.xxx.xxx.xxx'</span></a>
-<a class="sourceLine" id="cb1-12" title="12">      <span class="fu">VPN_PSK:</span><span class="at"> </span><span class="st">'shareKey'</span></a>
-<a class="sourceLine" id="cb1-13" title="13">      <span class="fu">VPN_USERNAME:</span><span class="at"> </span><span class="st">'UserName'</span></a>
-<a class="sourceLine" id="cb1-14" title="14">      <span class="fu">VPN_PASSWORD:</span><span class="at"> </span><span class="st">'UserPassword'</span></a>
-<a class="sourceLine" id="cb1-15" title="15">    <span class="fu">volumes:</span></a>
-<a class="sourceLine" id="cb1-16" title="16">      <span class="kw">-</span> <span class="st">&quot;/lib/modules:/lib/modules:ro&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># docker-compose.yaml</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;3&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">services</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">vpn</span><span class="kw">:</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> ubergarm/l2tp-ipsec-vpn-client</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">privileged</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">network_mode</span><span class="kw">:</span><span class="at"> host</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">environment</span><span class="kw">:</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">VPN_SERVER_IPV4</span><span class="kw">:</span><span class="at"> </span><span class="st">'xxx.xxx.xxx.xxx'</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">VPN_PSK</span><span class="kw">:</span><span class="at"> </span><span class="st">'shareKey'</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">VPN_USERNAME</span><span class="kw">:</span><span class="at"> </span><span class="st">'UserName'</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">VPN_PASSWORD</span><span class="kw">:</span><span class="at"> </span><span class="st">'UserPassword'</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">volumes</span><span class="kw">:</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">&quot;/lib/modules:/lib/modules:ro&quot;</span></span></code></pre></div>
 <p>After starting with <code>docker-compsoe up -d</code> You’ll then need to route your network traffic through the VPN with something like: <code>sudo ip route add 1.2.3.4 via 10.10.10.1 dev ppp0</code>. Please see the <a href="https://github.com/ubergarm/l2tp-ipsec-vpn-client#route">documentation on the GitHub project page</a>.</p>
 <p>I also found this method useful because a service can be added to the Docker Compose configuration without ever enabling the VPN on the host network. This is done by using the <code>vpn</code> service network like so:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb2-1" title="1">  <span class="fu">myservice:</span></a>
-<a class="sourceLine" id="cb2-2" title="2">    <span class="fu">image:</span><span class="at"> apline</span></a>
-<a class="sourceLine" id="cb2-3" title="3">    <span class="fu">network_mode:</span><span class="at"> service:vpn</span></a>
-<a class="sourceLine" id="cb2-4" title="4">    <span class="fu">command:</span><span class="at"> sh -c &quot;while true; do date; sleep 60; done&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">myservice</span><span class="kw">:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> apline</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">network_mode</span><span class="kw">:</span><span class="at"> service:vpn</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> sh -c &quot;while true; do date; sleep 60; done&quot;</span></span></code></pre></div>
 <p>You just need to expose the ports to the service on the <code>vpn</code> service because <code>vpn</code> and <code>myservice</code> effectively share the same IP.</p>
 
-<em>Modified: February 25, 2019 - 07:55:52 AM</em>
+<em>Modified: February 25, 2019 - 08:55:52 AM</em>
 
             </div>
 

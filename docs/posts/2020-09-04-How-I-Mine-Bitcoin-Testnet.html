@@ -45,20 +45,20 @@
 <ul>
 <li>Change <code>TESTNET_NUM</code> in <code>.env</code> before running <code>./build &amp;&amp; ./start</code>:</li>
 </ul>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ini"><code class="sourceCode ini"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># testnet for bitcoin and lnd:</span></a>
-<a class="sourceLine" id="cb1-2" title="2"><span class="co"># 0 = testnet off, 1 = testnet on</span></a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="dt">TESTNET_NUM</span><span class="ot">=</span><span class="dv">1</span></a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ini"><code class="sourceCode ini"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># testnet for bitcoin and lnd:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 0 = testnet off, 1 = testnet on</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">TESTNET_NUM</span><span class="ot">=</span><span class="dv">1</span></span></code></pre></div>
 <ul>
 <li><p>Copy <code>overrides/bitcoin-expose-ports.yml.tpl</code> to <code>overrides/bitcoin-expose-ports.yml</code> to expose RPC connection ports to P2Pool.</p></li>
 <li><p>Add the section below in <code>bitcoin_data\bitcoin.conf</code> after running <code>./build &amp;&amp; ./start</code>:</p></li>
 </ul>
-<div class="sourceCode" id="cb2"><pre class="sourceCode ini"><code class="sourceCode ini"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># Some testnet settings needed for 0.19, if using testnet</span></a>
-<a class="sourceLine" id="cb2-2" title="2"><span class="kw">[test]</span></a>
-<a class="sourceLine" id="cb2-3" title="3"><span class="co"># Allow RPC connections from outside of container localhost</span></a>
-<a class="sourceLine" id="cb2-4" title="4"><span class="dt">rpcbind</span><span class="ot">=</span><span class="dv">0</span><span class="st">.</span><span class="dv">0</span><span class="st">.</span><span class="fl">0.0</span></a>
-<a class="sourceLine" id="cb2-5" title="5"><span class="dt">onlynet</span><span class="ot">=</span><span class="st">onion</span></a>
-<a class="sourceLine" id="cb2-6" title="6"><span class="dt">rpcallowip</span><span class="ot">=</span><span class="dv">0</span><span class="st">.</span><span class="dv">0</span><span class="st">.</span><span class="fl">0.0</span><span class="st">/</span><span class="dv">0</span></a>
-<a class="sourceLine" id="cb2-7" title="7"><span class="dt">addnode</span><span class="ot">=</span><span class="st">va5vwn2ennpkjj2o.onion:</span><span class="dv">18333</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode ini"><code class="sourceCode ini"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Some testnet settings needed for 0.19, if using testnet</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">[test]</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Allow RPC connections from outside of container localhost</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="dt">rpcbind</span><span class="ot">=</span><span class="dv">0</span><span class="st">.</span><span class="dv">0</span><span class="st">.</span><span class="fl">0.0</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="dt">onlynet</span><span class="ot">=</span><span class="st">onion</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="dt">rpcallowip</span><span class="ot">=</span><span class="dv">0</span><span class="st">.</span><span class="dv">0</span><span class="st">.</span><span class="fl">0.0</span><span class="st">/</span><span class="dv">0</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="dt">addnode</span><span class="ot">=</span><span class="st">va5vwn2ennpkjj2o.onion:</span><span class="dv">18333</span></span></code></pre></div>
 <p>The <code>addnode</code> section will help testnet to connect through Tor only.</p>
 <p>I also set the <code>rpcuser</code> and <code>rpcpassword</code> to something other than the default. The P2Pool connects to Bitcoin core through RPC.</p>
 <h2 id="p2pool-node">P2Pool node</h2>
@@ -73,7 +73,8 @@
 </ul>
 <h2 id="sha256-miner">SHA256 Miner</h2>
 <p>Thanks to a kind miner, I was able to use a S17 AntMiner for a few hours, in order to test my setup and generate some testnet coins. Other minering devices, such as S9 Antminers should have similar setups.</p>
-<p>As explained in the <a href="https://github.com/jtoomim/p2pool/blob/155022fc942ec45778a95622766a9b11d923e76e/README.md">instructions from P2Pool README</a> I use <code>stratum+tcp://$BTC_NODE_IP:19332</code> for the URL field where <code>$BTC_NODE_IP</code> is the node IP running the P2Pool software. I use the same BTC address generated from Electrum for the “Worker” field. The GUI looks something like this: <img src="../images/2020-09/S17-AntMiner-configuration.png" alt="S17 AntMiner Testnet configuration with P2Pool" /></p>
+<p>As explained in the <a href="https://github.com/jtoomim/p2pool/blob/155022fc942ec45778a95622766a9b11d923e76e/README.md">instructions from P2Pool README</a> I use <code>stratum+tcp://$BTC_NODE_IP:19332</code> for the URL field where <code>$BTC_NODE_IP</code> is the node IP running the P2Pool software. I use the same BTC address generated from Electrum for the “Worker” field. The GUI looks something like this:
+<img src="../images/2020-09/S17-AntMiner-configuration.png" alt="S17 AntMiner Testnet configuration with P2Pool" /></p>
 <h2 id="bitcoin-testnet-wallet">Bitcoin Testnet wallet</h2>
 <p>Running the Electrum on Testnet requires running with the <code>--testnet</code> flag. So, on the command line, it looks like this <code>electrum --testnet</code> on Arch Linux. Once Electrum, is running, addresses can be generated the usual way but on testnet they will look different. I wasn’t sure what type of addresses were compatible with mining and P2Pool, so I used the legacy (P2PKH) addresses. See <a href="https://en.bitcoin.it/wiki/Address">Bitcoin address types in the bitcoin wiki</a> if you get confused about address types like me, but remember testnet addresses will look different than mainnet.</p>
 <h1 id="mining-results">Mining results</h1>
@@ -82,7 +83,7 @@
 <h1 id="conclusion">Conclusion</h1>
 <p>That was everything I needed to get coins mined on Bitcoin Testnet. I hope you found my write-up helpful. Happy hashing! ⛏</p>
 
-<em>Modified: September 19, 2020 - 05:55:44 PM</em>
+<em>Modified: September 19, 2020 - 06:55:44 PM</em>
 
             </div>
 

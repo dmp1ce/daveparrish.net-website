@@ -42,11 +42,11 @@
 <p>To change the memory allocated by multipass, use an <a href="https://forum.snapcraft.io/t/environment-variables-that-snapcraft-consumes/9416">snapcraft environment variable</a>, when running snapcraft. The snapcraft command will look like, <code>SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=4G snapcraft</code>, to allocate 4 GB. If snapcraft already ran with lower memory then you’ll need to rebuild the multipass VM by running <code>snapcraft clean</code> first.</p>
 <h1 id="using-stack-tool-in-snapcraft">Using Stack tool in Snapcraft</h1>
 <p>Many Haskell applications build using the stack tool. There is not a snapcraft plugin available for the stack tool so a build override is needed. The following snippet will download and install stack. Next the snippet will build the program with stack.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">override-build:</span> <span class="st">|</span></a>
-<a class="sourceLine" id="cb1-2" title="2">  if [ ! -x &quot;$(command -v stack)&quot; ]; then</a>
-<a class="sourceLine" id="cb1-3" title="3">    curl -sSL https://get.haskellstack.org/ | sh</a>
-<a class="sourceLine" id="cb1-4" title="4">  fi</a>
-<a class="sourceLine" id="cb1-5" title="5">  stack build --copy-bins</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">override-build</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  if [ ! -x &quot;$(command -v stack)&quot; ]; then</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    curl -sSL https://get.haskellstack.org/ | sh</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  fi</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  stack build --copy-bins</span></code></pre></div>
 <p>Use <code>plugin: nil</code> for the part building the Haskell program.</p>
 <p>Also, make sure <code>curl</code> and any other build dependencies you need are in the <code>build-packages</code> section.</p>
 <h1 id="finding-the-binary">Finding the binary</h1>
@@ -55,14 +55,14 @@
   /root/.local/bin/myapp: bin/myapp</code></pre>
 <h1 id="automatic-versioning">Automatic Versioning</h1>
 <p>Snapcraft can use the same version specified in the <code>package.yaml</code> like so:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">override-pull:</span> <span class="st">|</span></a>
-<a class="sourceLine" id="cb3-2" title="2">  snapcraftctl pull</a>
-<a class="sourceLine" id="cb3-3" title="3">  snapcraftctl set-version &quot;$(grep version package.yaml | awk '{ print $NF }')&quot;</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">override-pull</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  snapcraftctl pull</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  snapcraftctl set-version &quot;$(grep version package.yaml | awk '{ print $NF }')&quot;</span></code></pre></div>
 <p>Use <code>adopt-info</code> in the <code>snapcraft.yaml</code> to <a href="https://snapcraft.io/docs/using-external-metadata">select the part to use the version</a> info from.</p>
 <h1 id="example">Example</h1>
 <p>For a working example, see my <a href="https://github.com/dmp1ce/s17-turbo-switch/blob/master/snap/snapcraft.yaml">s17-turbo-switch snap configuration</a>.</p>
 
-<em>Modified: August 16, 2019 - 05:24:50 PM</em>
+<em>Modified: August 16, 2019 - 06:24:50 PM</em>
 
             </div>
 

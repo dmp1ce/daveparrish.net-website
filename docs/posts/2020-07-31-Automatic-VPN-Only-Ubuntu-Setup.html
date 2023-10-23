@@ -42,10 +42,12 @@
 <h1 id="picking-a-vpn-and-airvpn">Picking a VPN and AirVPN</h1>
 <p>I’m focused on AirVPN because they are an established VPN provider which has a balance of good prices, stable connections and promise of no logging. You’ll want to pick a VPN service you trust, but picking a provider other than AirVPN may not be compatible with this guide. There are a number of reviews for VPN service providers such as <a href="https://www.techradar.com/vpn/best-no-logs-vpns-to-stay-private-and-anonymous">this one</a>.</p>
 <p>Once you have signed up with a service provider you trust, then you’ll want to add the service in the Ubuntu Network settings. See Ubuntu’s <a href="https://help.ubuntu.com/stable/ubuntu-help/net-vpn-connect.html.en">official instructions for connecting to a VPN</a>.</p>
-<p>Here is what my settings look like. <img src="../images/2020-07/Network-VPN-settings.png" alt="Network connection window with VPN configured" /></p>
+<p>Here is what my settings look like.
+<img src="../images/2020-07/Network-VPN-settings.png" alt="Network connection window with VPN configured" /></p>
 <h1 id="automatic-vpn-on-startup">Automatic VPN on Startup</h1>
 <p>Following the answer <a href="https://askubuntu.com/a/1107738/25776">“How to connect to the VPN automatically on System Startup ?”</a> is as simple as modifying the connection setting in the Ubuntu GUI. The specific GUI can be launched using <code>nm-connection-manager</code> and the “Automatically connect to VPN” needs to be checked, with your VPN service being selected. The VPN service was added in the overall network settings in the last section.</p>
-<p>Here is my nm-connection-manager settings. <img src="../images/2020-07/Automatic-VPN-nm-connection-manager.png" alt="nm-connection-manager-automatic-VPN" /></p>
+<p>Here is my nm-connection-manager settings.
+<img src="../images/2020-07/Automatic-VPN-nm-connection-manager.png" alt="nm-connection-manager-automatic-VPN" /></p>
 <h1 id="force-network-traffic-through-vpn">Force network traffic through VPN</h1>
 <p>Usually, forcing traffic through VPN is the most tricky part because of all the edge cases. For example, what happens if the VPN connection goes down? For some use cases, it would be a disaster to just start communicating over the Internet without the VPN!</p>
 <p>To ensure traffic is only broadcast through the VPN, I created a script which deletes the “default” network route and creates a route which only goes through the AirVPN service. For more information on how this is possible in Ubuntu, see the resources <a href="https://sweetcode.io/routing-all-traffic-through-a-vpn-gateway-on-linux/">Routing All Traffic Through a VPN Gateway on Linux</a> and <a href="https://askubuntu.com/a/41445/25776">How do I make the script to run automatically when tun0 interface up/down events?</a>.</p>
@@ -73,12 +75,13 @@ fi</code></pre>
 <p>If you notice the Internet is down, then turning networking off and then on or turning on the VPN should get the Internet (through the VPN only) working again. I noticed my time and date would be wrong when resuming a virtual machine I was testing on. Toggling the VPN should help with fixing the date/time also.</p>
 <h2 id="modifications">Modifications</h2>
 <p>You’ll probably need to at least modify the ethernet device name and the AirVPN specific references if using a different VPN provider.</p>
-<p>Use <code>ip addr show</code> in the terminal to get a list of the ethernet devices on your machine. Mine looks like this in the terminal. <img src="../images/2020-07/Ethernet-device.png" alt="Ethernet device example" /></p>
+<p>Use <code>ip addr show</code> in the terminal to get a list of the ethernet devices on your machine. Mine looks like this in the terminal.
+<img src="../images/2020-07/Ethernet-device.png" alt="Ethernet device example" /></p>
 <p>You’ll also need to get a list of IPs your VPN provider uses so that you can allow those in your routes. I did this using the <code>dig</code> utility but I’m not sure if it would work as well with other VPN providers.</p>
 <h1 id="profit">Profit!</h1>
 <p>It should now be safe to rely on the VPN connection always being the route taken when communicating with the Internet. Please notify me if you see any mistakes or bugs. There are a variety of ways to reach me on <a href="../contact.html">my contact page</a>. Thank you for taking to time to read this guide! 💯</p>
 
-<em>Modified: July 31, 2020 - 10:28:30 AM</em>
+<em>Modified: July 31, 2020 - 11:28:30 AM</em>
 
             </div>
 

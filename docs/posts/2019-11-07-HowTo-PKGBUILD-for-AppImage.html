@@ -43,36 +43,36 @@
 <p>When there is a new release for the AppImage, the version, AppImage source location and sha256 hash can be updated, rebuilt and reinstalled.</p>
 <hr />
 <p><strong>NOTE:</strong> See <a href="../posts/2019-11-16-Better-AppImage-PKGBUILD-template.html">new post</a> on improving upon this template for better GUI integration.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># Maintainer: My Name &lt;myemail@domain.me&gt;</span></a>
-<a class="sourceLine" id="cb1-2" title="2"></a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="va">pkgname=</span>my-project-appimage</a>
-<a class="sourceLine" id="cb1-4" title="4"><span class="va">pkgver=</span>0.0.1</a>
-<a class="sourceLine" id="cb1-5" title="5"><span class="va">pkgrel=</span>1</a>
-<a class="sourceLine" id="cb1-6" title="6"><span class="va">pkgdesc=</span><span class="st">&quot;Description of my project&quot;</span></a>
-<a class="sourceLine" id="cb1-7" title="7"><span class="va">arch=(</span><span class="st">'x86_64'</span><span class="va">)</span></a>
-<a class="sourceLine" id="cb1-8" title="8"><span class="va">url=</span><span class="st">&quot;https://github.com/user/repo/&quot;</span></a>
-<a class="sourceLine" id="cb1-9" title="9"><span class="va">license=(</span><span class="st">'custom:Unlicense'</span><span class="va">)</span></a>
-<a class="sourceLine" id="cb1-10" title="10"><span class="va">depends=(</span><span class="st">'zlib'</span><span class="va">)</span></a>
-<a class="sourceLine" id="cb1-11" title="11"><span class="va">options=(</span>!strip<span class="va">)</span></a>
-<a class="sourceLine" id="cb1-12" title="12"><span class="va">source_x86_64=(</span><span class="st">&quot;</span><span class="va">${pkgname}</span><span class="st">-</span><span class="va">${pkgver}</span><span class="st">.AppImage::https://github.com/MyGithubUSERNAME/MyProjectRepo/releases/download/</span><span class="va">${pkgver}</span><span class="st">/myproject.AppImage&quot;</span></a>
-<a class="sourceLine" id="cb1-13" title="13">               <span class="st">&quot;https://raw.githubusercontent.com/MyGithubUSERNAME/MyProjectRepo/</span><span class="va">${pkgver}</span><span class="st">/LICENSE&quot;</span></a>
-<a class="sourceLine" id="cb1-14" title="14">              )</a>
-<a class="sourceLine" id="cb1-15" title="15"><span class="va">noextract=(</span><span class="st">&quot;</span><span class="va">${pkgname}</span><span class="st">-</span><span class="va">${pkgver}</span><span class="st">.AppImage&quot;</span><span class="va">)</span></a>
-<a class="sourceLine" id="cb1-16" title="16"><span class="va">sha256sums_x86_64=(</span><span class="st">'000000000000000000000000000000000000000000000000000000000000000'</span></a>
-<a class="sourceLine" id="cb1-17" title="17">                   <span class="st">'000000000000000000000000000000000000000000000000000000000000000'</span>)</a>
-<a class="sourceLine" id="cb1-18" title="18"></a>
-<a class="sourceLine" id="cb1-19" title="19"><span class="fu">package()</span> <span class="kw">{</span></a>
-<a class="sourceLine" id="cb1-20" title="20">    <span class="fu">install</span> -Dm755 <span class="st">&quot;</span><span class="va">${srcdir}</span><span class="st">/</span><span class="va">${pkgname}</span><span class="st">-</span><span class="va">${pkgver}</span><span class="st">.AppImage&quot;</span> <span class="st">&quot;</span><span class="va">${pkgdir}</span><span class="st">/opt/</span><span class="va">${pkgname}</span><span class="st">/</span><span class="va">${pkgname}</span><span class="st">.AppImage&quot;</span></a>
-<a class="sourceLine" id="cb1-21" title="21">    <span class="fu">install</span> -Dm644 <span class="st">&quot;</span><span class="va">${srcdir}</span><span class="st">/LICENSE&quot;</span> <span class="st">&quot;</span><span class="va">${pkgdir}</span><span class="st">/opt/</span><span class="va">${pkgname}</span><span class="st">/LICENSE&quot;</span></a>
-<a class="sourceLine" id="cb1-22" title="22"></a>
-<a class="sourceLine" id="cb1-23" title="23">    <span class="co"># Symlink executable</span></a>
-<a class="sourceLine" id="cb1-24" title="24">    <span class="fu">mkdir</span> -p <span class="st">&quot;</span><span class="va">${pkgdir}</span><span class="st">/usr/bin&quot;</span></a>
-<a class="sourceLine" id="cb1-25" title="25">    <span class="fu">ln</span> -s <span class="st">&quot;/opt/</span><span class="va">${pkgname}</span><span class="st">/</span><span class="va">${pkgname}</span><span class="st">.AppImage&quot;</span> <span class="st">&quot;</span><span class="va">${pkgdir}</span><span class="st">/usr/bin/</span><span class="va">${pkgname}</span><span class="st">&quot;</span></a>
-<a class="sourceLine" id="cb1-26" title="26"></a>
-<a class="sourceLine" id="cb1-27" title="27">    <span class="co"># Symlink license</span></a>
-<a class="sourceLine" id="cb1-28" title="28">    <span class="fu">mkdir</span> -p <span class="st">&quot;</span><span class="va">${pkgdir}</span><span class="st">/usr/share/licenses/</span><span class="va">$pkgname</span><span class="st">&quot;</span></a>
-<a class="sourceLine" id="cb1-29" title="29">    <span class="fu">ln</span> -s <span class="st">&quot;/opt/</span><span class="va">$pkgname</span><span class="st">/LICENSE&quot;</span> <span class="st">&quot;</span><span class="va">$pkgdir</span><span class="st">/usr/share/licenses/</span><span class="va">$pkgname</span><span class="st">&quot;</span></a>
-<a class="sourceLine" id="cb1-30" title="30"><span class="kw">}</span></a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Maintainer: My Name &lt;myemail@domain.me&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="va">pkgname</span><span class="op">=</span>my-project-appimage</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="va">pkgver</span><span class="op">=</span>0.0.1</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="va">pkgrel</span><span class="op">=</span>1</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="va">pkgdesc</span><span class="op">=</span><span class="st">&quot;Description of my project&quot;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="va">arch</span><span class="op">=</span><span class="va">(</span><span class="st">'x86_64'</span><span class="va">)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="va">url</span><span class="op">=</span><span class="st">&quot;https://github.com/user/repo/&quot;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="va">license</span><span class="op">=</span><span class="va">(</span><span class="st">'custom:Unlicense'</span><span class="va">)</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="va">depends</span><span class="op">=</span><span class="va">(</span><span class="st">'zlib'</span><span class="va">)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="va">options</span><span class="op">=</span><span class="va">(</span>!strip<span class="va">)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="va">source_x86_64</span><span class="op">=</span><span class="va">(</span><span class="st">&quot;</span><span class="va">${pkgname}</span><span class="st">-</span><span class="va">${pkgver}</span><span class="st">.AppImage::https://github.com/MyGithubUSERNAME/MyProjectRepo/releases/download/</span><span class="va">${pkgver}</span><span class="st">/myproject.AppImage&quot;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;https://raw.githubusercontent.com/MyGithubUSERNAME/MyProjectRepo/</span><span class="va">${pkgver}</span><span class="st">/LICENSE&quot;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>              <span class="va">)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="va">noextract</span><span class="op">=</span><span class="va">(</span><span class="st">&quot;</span><span class="va">${pkgname}</span><span class="st">-</span><span class="va">${pkgver}</span><span class="st">.AppImage&quot;</span><span class="va">)</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="va">sha256sums_x86_64</span><span class="op">=</span><span class="va">(</span><span class="st">'000000000000000000000000000000000000000000000000000000000000000'</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>                   <span class="st">'000000000000000000000000000000000000000000000000000000000000000'</span><span class="va">)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">package()</span> <span class="kw">{</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install</span> <span class="at">-Dm755</span> <span class="st">&quot;</span><span class="va">${srcdir}</span><span class="st">/</span><span class="va">${pkgname}</span><span class="st">-</span><span class="va">${pkgver}</span><span class="st">.AppImage&quot;</span> <span class="st">&quot;</span><span class="va">${pkgdir}</span><span class="st">/opt/</span><span class="va">${pkgname}</span><span class="st">/</span><span class="va">${pkgname}</span><span class="st">.AppImage&quot;</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install</span> <span class="at">-Dm644</span> <span class="st">&quot;</span><span class="va">${srcdir}</span><span class="st">/LICENSE&quot;</span> <span class="st">&quot;</span><span class="va">${pkgdir}</span><span class="st">/opt/</span><span class="va">${pkgname}</span><span class="st">/LICENSE&quot;</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Symlink executable</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mkdir</span> <span class="at">-p</span> <span class="st">&quot;</span><span class="va">${pkgdir}</span><span class="st">/usr/bin&quot;</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ln</span> <span class="at">-s</span> <span class="st">&quot;/opt/</span><span class="va">${pkgname}</span><span class="st">/</span><span class="va">${pkgname}</span><span class="st">.AppImage&quot;</span> <span class="st">&quot;</span><span class="va">${pkgdir}</span><span class="st">/usr/bin/</span><span class="va">${pkgname}</span><span class="st">&quot;</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Symlink license</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mkdir</span> <span class="at">-p</span> <span class="st">&quot;</span><span class="va">${pkgdir}</span><span class="st">/usr/share/licenses/</span><span class="va">$pkgname</span><span class="st">&quot;</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ln</span> <span class="at">-s</span> <span class="st">&quot;/opt/</span><span class="va">$pkgname</span><span class="st">/LICENSE&quot;</span> <span class="st">&quot;</span><span class="va">$pkgdir</span><span class="st">/usr/share/licenses/</span><span class="va">$pkgname</span><span class="st">&quot;</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
 <h2 id="why">Why?</h2>
 <p>AppImages are already easy to install and run as noted in <a href="https://superuser.com/a/1307178/109464">this StackOverflow answer</a>. You could just copy the appimage to <code>/usr/local/bin</code> and make it executable with a <code>chmod +x /usr/local/bin/my-project.AppImage</code> so you could run it from the command line. When updating, just replace the AppImage file with the new version. Many AppImage applications notify the user when an update is available.</p>
 <p>This does require each AppImage is updated independently and the user will only know when the application notifies them of an update.</p>
@@ -81,7 +81,7 @@
 <h2 id="desktop-launcher">Desktop Launcher</h2>
 <p>My template doesn’t install a desktop launcher because when running the AppImage for the first time, it will prompt the user for installing the desktop launcher. On the first run, the user will need to launch the application from the command line. From then on, the AppImage application will be available where the other desktop applications are, if the user selected to install the desktop launcher.</p>
 
-<em>Modified: November 17, 2019 - 06:10:39 PM</em>
+<em>Modified: November 17, 2019 - 07:10:39 PM</em>
 
             </div>
 

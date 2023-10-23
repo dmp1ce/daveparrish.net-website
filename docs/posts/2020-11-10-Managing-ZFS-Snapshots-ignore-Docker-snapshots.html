@@ -81,7 +81,7 @@ zroot/022c3a6e9a40f3f62e3d13189970603b8b2ba6bb013817abd5db67c335e97e4c        11
 <h2 id="turn-off-docker">Turn off Docker</h2>
 <p>Turn off Docker service before changing Docker settings. The command <code>sudo systemctl stop docker</code> will turn of Docker service and all running Docker services.</p>
 <h2 id="set-new-dataset-location-for-docker">Set new dataset location for Docker</h2>
-<p>While Docker is off, the <code>/etc/docker/daemon.json</code> can be create/edited to contain the setting <code>&quot;storage-opts&quot;: [&quot;zfs.fsname=zroot/docker&quot;]</code>.</p>
+<p>While Docker is off, the <code>/etc/docker/daemon.json</code> can be create/edited to contain the setting <code>"storage-opts": ["zfs.fsname=zroot/docker"]</code>.</p>
 <p>For example: <code>$ cat /etc/docker/dameon.json</code></p>
 <pre><code>{
     &quot;storage-opts&quot;: [
@@ -92,33 +92,33 @@ zroot/022c3a6e9a40f3f62e3d13189970603b8b2ba6bb013817abd5db67c335e97e4c        11
 <h2 id="use-a-script-to-move-over-all-docker-datasets">Use a script to move over all Docker datasets</h2>
 <p>Unfortunately, I do not know of built in way to move many child datasets. I had to use a bash script to move all the child datasets which in my case was only Docker datasets. For your case you might need to make a different script to target only the Docker datasets. Using a command like <code>./move_zfs_child_datasets.bash zpool/ROOT/default zpool/docker</code> should move all the datasets.</p>
 <p>Here is the script I used to move the datasets:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="co">#!/bin/bash</span></a>
-<a class="sourceLine" id="cb3-2" title="2"></a>
-<a class="sourceLine" id="cb3-3" title="3"><span class="co"># Move all ZFS child datasets to a new parent dataset</span></a>
-<a class="sourceLine" id="cb3-4" title="4"></a>
-<a class="sourceLine" id="cb3-5" title="5"><span class="kw">if</span><span class="bu"> [</span> <span class="ot">!</span> <span class="va">$#</span> <span class="ot">-eq</span> 2<span class="bu"> ]</span>; <span class="kw">then</span></a>
-<a class="sourceLine" id="cb3-6" title="6">    <span class="bu">echo</span> <span class="st">&quot;Please supply a source and destination ZFS dataset as the first and second parameter&quot;</span></a>
-<a class="sourceLine" id="cb3-7" title="7">    <span class="bu">echo</span> <span class="st">&quot;Example: ./move_zfs_child_datasets.bash zpool/ROOT/default zpool/docker&quot;</span></a>
-<a class="sourceLine" id="cb3-8" title="8">    <span class="bu">exit</span><span class="kw">;</span></a>
-<a class="sourceLine" id="cb3-9" title="9"><span class="kw">fi</span></a>
-<a class="sourceLine" id="cb3-10" title="10"></a>
-<a class="sourceLine" id="cb3-11" title="11"><span class="va">currentDatasetPath=$1</span></a>
-<a class="sourceLine" id="cb3-12" title="12"><span class="va">newDatasetPath=$2</span></a>
-<a class="sourceLine" id="cb3-13" title="13"></a>
-<a class="sourceLine" id="cb3-14" title="14"><span class="va">currentDatasets=$(</span><span class="ex">zfs</span> list -H -t filesystem -d 1 -o name <span class="st">&quot;</span><span class="va">$currentDatasetPath</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="fu">tail</span> +2<span class="va">)</span></a>
-<a class="sourceLine" id="cb3-15" title="15"></a>
-<a class="sourceLine" id="cb3-16" title="16"><span class="kw">for</span> <span class="ex">dataset</span> in <span class="va">$currentDatasets</span> <span class="kw">;</span> <span class="kw">do</span></a>
-<a class="sourceLine" id="cb3-17" title="17">    <span class="va">newDataset=</span><span class="st">&quot;</span><span class="va">$newDatasetPath</span><span class="st">/</span><span class="va">${dataset##</span>*/<span class="va">}</span><span class="st">&quot;</span></a>
-<a class="sourceLine" id="cb3-18" title="18">    <span class="bu">echo</span> <span class="st">&quot;Move </span><span class="va">$dataset</span><span class="st"> to </span><span class="va">$newDataset</span><span class="st">&quot;</span></a>
-<a class="sourceLine" id="cb3-19" title="19">    <span class="fu">sudo</span> zfs rename <span class="st">&quot;</span><span class="va">$dataset</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$newDataset</span><span class="st">&quot;</span></a>
-<a class="sourceLine" id="cb3-20" title="20"><span class="kw">done</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Move all ZFS child datasets to a new parent dataset</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="ot">!</span> <span class="va">$#</span> <span class="ot">-eq</span> 2 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Please supply a source and destination ZFS dataset as the first and second parameter&quot;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Example: ./move_zfs_child_datasets.bash zpool/ROOT/default zpool/docker&quot;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">exit</span><span class="kw">;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="va">currentDatasetPath</span><span class="op">=</span><span class="va">$1</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="va">newDatasetPath</span><span class="op">=</span><span class="va">$2</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="va">currentDatasets</span><span class="op">=</span><span class="va">$(</span><span class="ex">zfs</span> list <span class="at">-H</span> <span class="at">-t</span> filesystem <span class="at">-d</span> 1 <span class="at">-o</span> name <span class="st">&quot;</span><span class="va">$currentDatasetPath</span><span class="st">&quot;</span> <span class="kw">|</span> <span class="fu">tail</span> +2<span class="va">)</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> dataset <span class="kw">in</span> <span class="va">$currentDatasets</span> <span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="va">newDataset</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$newDatasetPath</span><span class="st">/</span><span class="va">${dataset</span><span class="op">##</span><span class="pp">*</span>/<span class="va">}</span><span class="st">&quot;</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Move </span><span class="va">$dataset</span><span class="st"> to </span><span class="va">$newDataset</span><span class="st">&quot;</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sudo</span> zfs rename <span class="st">&quot;</span><span class="va">$dataset</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$newDataset</span><span class="st">&quot;</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
 Or the Gist version:
 <script src="https://gist.github.com/dmp1ce/5f51f798eee3806654f171e2b0272590.js"></script>
 <h2 id="turn-on-docker">Turn on Docker</h2>
 <p>After moving all the datasets, it should be safe to turn Docker back on. All Docker services should resume as normal. Start Docker with the command <code>sudo systemctl start docker</code>.</p>
 <h1 id="syncoid-replication">Syncoid replication</h1>
 <p>Another reason why I didn’t want all the Docker datasets and snapshots is because syncoid commands took a long time. Even when nothing changed, I found it took 10 minutes just to traverse all of the snapshots! With Docker datasets on their own parent dataset, it is straightforward to exclude Docker datasets during replication.</p>
-<p>I use a command like <code>syncoid --exclude=&quot;zroot\/docker&quot; --exclude=&quot;zroot\/docker\/[\w]+(-init)?&quot; --exclude=&quot;zroot/swap&quot; -r zroot myserver:rpool/backups/mylaptop/zroot</code> to replicate almost all of the ZFS data on another computer.</p>
+<p>I use a command like <code>syncoid --exclude="zroot\/docker" --exclude="zroot\/docker\/[\w]+(-init)?" --exclude="zroot/swap" -r zroot myserver:rpool/backups/mylaptop/zroot</code> to replicate almost all of the ZFS data on another computer.</p>
 <h2 id="why-syncoid">Why Syncoid</h2>
 <p>I wanted to take advantage of ZFS for quick backups. I have some big datasets and I felt like Syncoid which takes advantage of <code>zfs send</code> made the most sense.</p>
 <p>I would have liked to figure out how to encrypt the destination of the replication, but other than that, the replication process works very well, after the many snapshots from Docker datasets are excluded.</p>
@@ -129,7 +129,7 @@ Or the Gist version:
 <p>After going through all this effort to avoid syncing unnecessary datasets and snapshots, I’m still not sure it is worth it. Maybe my time would have been better spent setting up a Borg Backup configuration and not worry about these ZFS issues. On the other hand, my replications of datasets is now very fast, easy to maintain and kept at a minimum size.</p>
 <p>Hopefully this will be useful to more than just myself. I know I learned more about how ZFS handles datasets and snapshots. Please let me know if you know a better way to backup/replicate ZFS datasets while ignoring unnecessary datasets like Docker creates.</p>
 
-<em>Modified: November 10, 2020 - 08:40:48 PM</em>
+<em>Modified: November 10, 2020 - 09:40:48 PM</em>
 
             </div>
 
