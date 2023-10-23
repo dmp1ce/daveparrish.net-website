@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Helpful for syncing files from generated Hakyll site
 
